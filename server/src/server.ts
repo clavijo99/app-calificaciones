@@ -1,10 +1,28 @@
-import app from './app';
-import config from './config';
-import db from './database';
+import express, { Application } from 'express'
 
-db(config.db);
+class Server {
 
+    app: Application;
+    constructor() {
+        this.app = express();
+        this.config();
+        this.router();
+    }
 
-app.listen(config.port , () => {
-    console.log(`server running on port ${config.port}`)
-})
+    config(): void {
+        this.app.set('port' , process.env.PORT || 3000);
+    }
+
+    router(): void {
+
+    }
+
+    start(): void {
+        this.app.listen(this.app.get('port') , () => {
+            console.log(`server running on port ${this.app.get('port')}`);
+        })
+    }
+}
+
+const server = new Server();
+server.start();

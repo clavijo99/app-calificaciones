@@ -3,10 +3,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const app_1 = __importDefault(require("./app"));
-const config_1 = __importDefault(require("./config"));
-const database_1 = __importDefault(require("./database"));
-database_1.default(config_1.default.db);
-app_1.default.listen(config_1.default.port, () => {
-    console.log(`server running on port ${config_1.default.port}`);
-});
+const express_1 = __importDefault(require("express"));
+class Server {
+    constructor() {
+        this.app = express_1.default();
+        this.config();
+        this.router();
+    }
+    config() {
+        this.app.set('port', process.env.PORT || 3000);
+    }
+    router() {
+    }
+    start() {
+        this.app.listen(this.app.get('port'), () => {
+            console.log(`server running on port ${this.app.get('port')}`);
+        });
+    }
+}
+const server = new Server();
+server.start();
