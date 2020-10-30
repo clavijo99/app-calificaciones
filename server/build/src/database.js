@@ -12,35 +12,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const app_1 = __importDefault(require("./app"));
-const database_1 = __importDefault(require("./database"));
-class Server {
+const mongoose_1 = __importDefault(require("mongoose"));
+const config_1 = __importDefault(require("./config"));
+class Database {
     constructor() {
-        this.tempo = 5;
-    }
-    StrartDatabase() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const status = yield database_1.default.start();
-            if (status) {
-                console.log('database running');
-                this.start();
-            }
-            else if (this.tempo == 0) {
-                console.log('tiempo agotado');
-                return;
-            }
-            else {
-                console.log('intentando conectar con la base de datos');
-                this.tempo--;
-                this.StrartDatabase();
-            }
-        });
+        this.MONGODB_URI = `mongodb://${config_1.default.MONGODB_HOST}/${config_1.default.MONGODB_DATABASE}`;
     }
     start() {
-        app_1.default.listen(app_1.default.get('port'), () => {
-            console.log(`server running on port ${app_1.default.get('port')}`);
+        return __awaiter(this, void 0, void 0, function* () {
+            let status = false;
+            yield mongoose_1.default.connect(this.MONGODB_URI, {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+                useFindAndModify: false,
+                useCreateIndex: true,
+            }).then((db) => status = true)
+                .catch((err) => status = false);
+            return status;
         });
     }
 }
-const server = new Server();
-server.StrartDatabase();
+const database = new Database();
+exports.default = database;

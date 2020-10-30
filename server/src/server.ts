@@ -1,28 +1,31 @@
-import express, { Application } from 'express'
+import app from './app';
+import databa from './database';
 
 class Server {
 
-    app: Application;
-    constructor() {
-        this.app = express();
-        this.config();
-        this.router();
-    }
+    private tempo = 5;
 
-    config(): void {
-        this.app.set('port' , process.env.PORT || 3000);
-    }
+    constructor() { }
 
-    router(): void {
-
+    async StrartDatabase(): Promise<void> {
+        const status = await databa.start();
+        if (status) {
+            console.log('database running');
+            this.start();
+        } else if (this.tempo == 0) { console.log('tiempo agotado'); return }
+        else {
+            console.log('intentando conectar con la base de datos');
+            this.tempo--;
+            this.StrartDatabase();
+        }
     }
 
     start(): void {
-        this.app.listen(this.app.get('port') , () => {
-            console.log(`server running on port ${this.app.get('port')}`);
+        app.listen(app.get('port'), () => {
+            console.log(`server running on port ${app.get('port')}`);
         })
     }
 }
 
 const server = new Server();
-server.start();
+server.StrartDatabase();

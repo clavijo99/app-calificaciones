@@ -12,35 +12,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const app_1 = __importDefault(require("./app"));
-const database_1 = __importDefault(require("./database"));
-class Server {
-    constructor() {
-        this.tempo = 5;
-    }
-    StrartDatabase() {
+const teacher_model_1 = __importDefault(require("../../models/user/teacher.model"));
+class TeacherController {
+    all(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const status = yield database_1.default.start();
-            if (status) {
-                console.log('database running');
-                this.start();
-            }
-            else if (this.tempo == 0) {
-                console.log('tiempo agotado');
-                return;
-            }
-            else {
-                console.log('intentando conectar con la base de datos');
-                this.tempo--;
-                this.StrartDatabase();
-            }
+            const teacher = yield teacher_model_1.default.find({}, (err, response) => {
+                if (err) {
+                    res.json('erro');
+                }
+                else {
+                    res.json(response);
+                }
+            });
         });
     }
-    start() {
-        app_1.default.listen(app_1.default.get('port'), () => {
-            console.log(`server running on port ${app_1.default.get('port')}`);
+    CreateTeacher(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = req.body;
+            const teacher = new teacher_model_1.default(data);
+            teacher.save();
+            res.json(data);
         });
     }
 }
-const server = new Server();
-server.StrartDatabase();
+const teacherController = new TeacherController();
+exports.default = teacherController;
